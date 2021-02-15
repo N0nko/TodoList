@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69c8bdbc86df17847a141ec68d1e6c21, type: 3}
+  m_Name: RedBlueTheme
+  m_EditorClassIdentifier: 
+  primaryColor: {r: 0.90196085, g: 0.22352943, b: 0.27450982, a: 1}
+  secondaryColor: {r: 0.27058825, g: 0.48235297, b: 0.6156863, a: 1}
+  primarySuplementaryColor: {r: 0.9960785, g: 0.59607846, b: 0.627451, a: 1}
+  secondarySuplementaryColor: {r: 0.65882355, g: 0.854902, b: 0.86274517, a: 1}
+  lightTextColor: {r: 0.9450981, g: 0.9803922, b: 0.9333334, a: 1}
+  darkTextColor: {r: 0.103773594, g: 0.103773594, b: 0.103773594, a: 1}
+  mainBackgroundColor: {r: 0.16078432, g: 0.16078432, b: 0.16078432, a: 1}
+  logo: {fileID: 21300000, guid: ccbafd9f3ad62124ca2d2f5bf8148f50, type: 3}
+  background: {fileID: 21300000, guid: afb7706f5ff7b144cb9d17828e564b9f, type: 3}
