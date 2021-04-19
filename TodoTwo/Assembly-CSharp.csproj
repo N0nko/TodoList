@@ -65,7 +65,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\DesktopClient\AnimationPlayer.cs" />
+    <Compile Include="Assets\Scripts\DesktopClient\Back-end\RequestController.cs" />
     <Compile Include="Assets\Scripts\DesktopClient\LoadingAnimationPlayer.cs" />
+    <Compile Include="Assets\Scripts\DesktopClient\TaskList_Desktop.cs" />
+    <Compile Include="Assets\Scripts\DesktopClient\Task_Desktop.cs" />
     <Compile Include="Assets\Scripts\DesktopClient\Theme.cs" />
     <Compile Include="Assets\Scripts\DesktopClient\ThemeApplier.cs" />
     <Compile Include="Assets\Scripts\DesktopClient\ThemeManager.cs" />
@@ -78,7 +81,6 @@
     <Compile Include="Assets\Scripts\TaskListController.cs" />
     <Compile Include="Assets\Scripts\Web Integration\LoginController.cs" />
     <Compile Include="Assets\Scripts\Web Integration\RegisterController.cs" />
-    <Compile Include="Assets\Scripts\Web Integration\RequestController.cs" />
     <Compile Include="Assets\Scripts\Web Integration\SessionController.cs" />
     <None Include="Assets\Fonts\Roboto\LICENSE.txt" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />

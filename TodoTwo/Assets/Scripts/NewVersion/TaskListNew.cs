@@ -13,15 +13,15 @@ public class TaskListNew : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        transform.GetChild(2).gameObject.GetComponent<Button>().onClick.AddListener(delegate { Remove(); });
+        //transform.GetChild(2).gameObject.GetComponent<Button>().onClick.AddListener(delegate { Remove(); });
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.GetChild(1).gameObject.GetComponent<TMP_Text>().text = listName;
-        transform.GetChild(0).gameObject.GetComponent<Image>().fillAmount = GetProgress();
-        GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(GetComponent<RectTransform>().anchoredPosition, targetPosition, Time.deltaTime * 6);
+        transform.GetChild(0).gameObject.GetComponent<TMP_Text>().text = listName;
+        //transform.GetChild(0).gameObject.GetComponent<Image>().fillAmount = GetProgress();
+        //GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(GetComponent<RectTransform>().anchoredPosition, targetPosition, Time.deltaTime * 6);
     }
 
     public void Remove()

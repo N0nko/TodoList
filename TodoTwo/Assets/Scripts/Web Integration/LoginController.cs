@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class LoginController : MonoBehaviour
 {
@@ -11,6 +12,9 @@ public class LoginController : MonoBehaviour
     public GameObject todoList, mainMenu;
 
     public SessionController sessionController;
+
+    public UnityEvent loginButtonClickEvent;
+    public UnityEvent loginEvent;
     class Code
     {
         public string code;
@@ -60,6 +64,7 @@ public class LoginController : MonoBehaviour
     {
         string u = usernameObject.text.Trim();
         string psw = passwordObject.text.Trim();
+        loginButtonClickEvent.Invoke();
         StartCoroutine(LoginEnumerator(u, psw));
     }
 
@@ -98,16 +103,18 @@ public class LoginController : MonoBehaviour
         string jsonToken = RequestController.GetResponseData();
         accessToken = JsonUtility.FromJson<Token>(jsonToken).accessToken;
 
-        todoList.SetActive(true);
-        mainMenu.SetActive(false);
+        //todoList.SetActive(true);
+        //mainMenu.SetActive(false);
         SessionController.SetAccessToken(accessToken);
 
 
-
+        yield return new WaitForSeconds(0.5f);
         yield return sessionController.GetLists();
         UISystem.instance.GenerateTaskLists();
         yield return sessionController.GetAllTasks();
         UISystem.instance.MapTasksToLists();
+
+        loginEvent.Invoke();
     }
 }
 

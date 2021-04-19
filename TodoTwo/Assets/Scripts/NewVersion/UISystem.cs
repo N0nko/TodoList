@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 public class UISystem : MonoBehaviour
 {
@@ -12,7 +13,11 @@ public class UISystem : MonoBehaviour
 
     public TaskListNew currentList;
 
-    public CanvasGroup listView, taskView;
+    public UnityEvent openProjectEvent;
+    public UnityEvent backToListViewEvent;
+
+    public GridLayoutGroup listView;
+    public VerticalLayoutGroup taskView;
     public Image taskViewBlue, taskViewProgress;
     public GameObject listPrefab, taskPrefab, taskViewObject;
 
@@ -57,6 +62,7 @@ public class UISystem : MonoBehaviour
     {
         for(int i = 0; i < sessionController.taskLists.Count; i++)
         {
+            Debug.Log(sessionController.taskLists[i].name);
             GameObject obj = Instantiate(listPrefab, listView.transform);
             obj.GetComponent<RectTransform>().localScale = Vector3.one;
             obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -3000);
@@ -95,11 +101,13 @@ public class UISystem : MonoBehaviour
     public void EnterTaskView(TaskListNew list)
     {
         StartCoroutine(TaskViewCoroutine(list));
+        openProjectEvent.Invoke();
         currentList = list;
     }
     public void GoBackToListView()
     {
-        StartCoroutine(ReturnToListViewCoroutine());
+        //StartCoroutine(ReturnToListViewCoroutine());
+        backToListViewEvent.Invoke();
     }
     public void RemoveAllTaskObjects()
     {
@@ -136,23 +144,8 @@ public class UISystem : MonoBehaviour
             task.gameObject.SetActive(true);
         }
 
-        taskViewObject.transform.GetChild(0).GetChild(2).gameObject.GetComponent<TMPro.TMP_Text>().text = list.listName;
-        taskViewBlue.GetComponent<RectTransform>().sizeDelta = new Vector2(1, 1);
-        taskViewProgress.fillAmount = 0;
-        currentFillAmount = 0;
-        currentListViewAlpha = 0;
-        currentTaskViewAlpha = 1;
-        currentTaskViewHolderAlpha = 0;
-        currentTaskCircleSize = 1;
-        listView.interactable = false;
-        yield return new WaitForSeconds(0.5f);
-        
-        taskViewObject.gameObject.SetActive(true);
-        currentTaskCircleSize = 3000;
-        yield return new WaitForSeconds(0.8f);
-        currentTaskViewHolderAlpha = 1;
-        yield return new WaitForSeconds(0.3f);
-        currentFillAmount = list.GetProgress();
+        taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_Text>().text = list.listName;
+        yield return new WaitForSeconds(0.1f);
     }
     public void CreateNewTask()
     {
@@ -249,30 +242,18 @@ public class UISystem : MonoBehaviour
         yield return new WaitForSeconds(0.9f);
         taskViewObject.SetActive(false);
         currentListViewAlpha = 1;
-        listView.interactable = true;
+        //listView.interactable = true;
         //RemoveAllTaskObjects();
     }
 
     // Update is called once per frame
     void Update()
     {
-        taskViewProgress.fillAmount = Mathf.Lerp(taskViewProgress.fillAmount, currentFillAmount, Time.deltaTime*6);
+        /*taskViewProgress.fillAmount = Mathf.Lerp(taskViewProgress.fillAmount, currentFillAmount, Time.deltaTime*6);
         listView.alpha = Mathf.Lerp(listView.alpha, currentListViewAlpha, Time.deltaTime * 6);
         taskView.alpha = Mathf.Lerp(taskView.alpha, currentTaskViewHolderAlpha, Time.deltaTime * 6);
         taskViewObject.GetComponent<CanvasGroup>().alpha = Mathf.Lerp(taskViewObject.GetComponent<CanvasGroup>().alpha, currentTaskViewAlpha, Time.deltaTime * 6);
         taskViewBlue.GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(taskViewBlue.GetComponent<RectTransform>().sizeDelta, new Vector2(currentTaskCircleSize, currentTaskCircleSize), Time.deltaTime * 2);
-        foreach (TaskListNew taskList in taskLists)
-        {
-            
-            for (int i = 0; i < taskList.tasks.Count; i++)
-            {
-                taskList.tasks[i].targetPosition = new Vector2(0, -700 + (-280 * i));
-            }
-        }
-
-        for(int i = 0; i < taskLists.Count; i++)
-        {
-            taskLists[i].targetPosition = new Vector2(0, -700 + (-200 * i));
-        }
+        */
     }
 }
