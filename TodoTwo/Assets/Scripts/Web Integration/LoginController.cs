@@ -73,7 +73,7 @@ public class LoginController : MonoBehaviour
         Debug.Log(f);
         //74 65 73 74 33 e2 80 8b
         //74 65 73 74 33
-       yield return RequestController.PostRequestWorkaround("authentication/login", bytes, "");
+       yield return RequestController.PostRequest("authentication/login", bytes, "");
 
         string jsonCode = RequestController.GetResponseData();
 
@@ -93,7 +93,7 @@ public class LoginController : MonoBehaviour
         TokenForm t = new TokenForm("authorization_code", code);
         var tok = JsonUtility.ToJson(t);
         var tokenBytes = System.Text.Encoding.UTF8.GetBytes(tok);
-        yield return RequestController.PostRequestWorkaround("token", tokenBytes, "");
+        yield return RequestController.PostRequest("token", tokenBytes, "");
 
         string jsonToken = RequestController.GetResponseData();
         accessToken = JsonUtility.FromJson<Token>(jsonToken).accessToken;

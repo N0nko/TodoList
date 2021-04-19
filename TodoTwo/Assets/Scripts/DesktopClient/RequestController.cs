@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,7 +9,7 @@ public class RequestController : MonoBehaviour
 
     public static string GetResponseData() => responseData;
 
-    public static IEnumerator PostRequestWorkaround(string relativePath, byte[] jsonData, string accessToken)
+    public static IEnumerator PostRequest(string relativePath, byte[] jsonData, string accessToken)
     {
         string data = System.Text.Encoding.UTF8.GetString(jsonData);
         //78.56.76.51:8080/api/v0.1/
@@ -41,37 +40,12 @@ public class RequestController : MonoBehaviour
         }
     }
 
-    public static IEnumerator PostRequest(string relativePath, WWWForm form)
-    {
-        //78.56.76.51:8080/api/v0.1/
-        //http://ec2-52-59-205-209.eu-central-1.compute.amazonaws.com/api/v0.1/
-        using (UnityWebRequest www = UnityWebRequest.Post("http://78.56.76.51:8080/api/v0.1/" + relativePath, form))
-        {
-            www.useHttpContinue = false;
-            //www.SetRequestHeader("content-type", "application/json");
-            yield return www.SendWebRequest();
-
-
-            if (www.isNetworkError || www.isHttpError)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                Debug.Log("Form upload complete!");
-                responseData = www.downloadHandler.text;
-                Debug.Log(responseData);
-            }
-
-        }
-    }
-
     public static IEnumerator GetRequest(string relativePath, string authorization)
     {
         using (UnityWebRequest www = UnityWebRequest.Get("http://ec2-52-59-205-209.eu-central-1.compute.amazonaws.com/api/v0.1/" + relativePath))
         {
             Debug.Log(authorization);
-            
+
             //www.useHttpContinue = false;
             www.SetRequestHeader("authorization", "Bearer " + authorization);
             yield return www.SendWebRequest();

@@ -32,6 +32,6 @@ public class RegisterController : MonoBehaviour
         var f = JsonUtility.ToJson(register);
         var bytes = System.Text.Encoding.UTF8.GetBytes(f);
 
-        StartCoroutine(RequestController.PostRequestWorkaround("authentication/register", bytes, ""));
+        StartCoroutine(RequestController.PostRequest("authentication/register", bytes, ""));
     }
 }

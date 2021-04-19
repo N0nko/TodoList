@@ -180,7 +180,7 @@ public class UISystem : MonoBehaviour
         t.name = name;
         var to = JsonUtility.ToJson(t);
         var bytes = System.Text.Encoding.UTF8.GetBytes(to);
-        yield return RequestController.PostRequestWorkaround("list", bytes, sessionController.GetAccessToken());
+        yield return RequestController.PostRequest("list", bytes, sessionController.GetAccessToken());
 
         ListModel result = JsonUtility.FromJson<ListModel>(RequestController.GetResponseData());
         GameObject obj = Instantiate(listPrefab, listView.transform);
@@ -216,7 +216,7 @@ public class UISystem : MonoBehaviour
         Debug.Log(m);
         var modelBytes = System.Text.Encoding.UTF8.GetBytes(m);
         
-        yield return RequestController.PostRequestWorkaround("task", modelBytes, sessionController.GetAccessToken());
+        yield return RequestController.PostRequest("task", modelBytes, sessionController.GetAccessToken());
         TaskModel result = JsonUtility.FromJson<TaskModel>(RequestController.GetResponseData());
         GameObject obj = Instantiate(taskPrefab, taskView.transform);
         obj.GetComponent<RectTransform>().localScale = Vector3.one;
