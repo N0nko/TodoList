@@ -29,6 +29,7 @@ public class RequestController : MonoBehaviour
             if (www.isNetworkError || www.isHttpError)
             {
                 Debug.Log(www.error);
+                Debug.Log(www.downloadHandler.text);
             }
             else
             {

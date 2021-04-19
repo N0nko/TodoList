@@ -19,7 +19,7 @@ public class UISystem : MonoBehaviour
     public GridLayoutGroup listView;
     public VerticalLayoutGroup taskView;
     public Image taskViewBlue, taskViewProgress;
-    public GameObject listPrefab, taskPrefab, taskViewObject;
+    public GameObject listPrefab, taskPrefab, taskViewObject, taskContainer;
 
     public TMP_InputField newListName;
     public Button newListButton;
@@ -82,7 +82,7 @@ public class UISystem : MonoBehaviour
         {
             if (sessionController.tasks[i].listId == list.id)
             {
-                GameObject obj = Instantiate(taskPrefab, taskView.transform);
+                GameObject obj = Instantiate(taskPrefab, taskContainer.transform);
                 obj.GetComponent<RectTransform>().localScale = Vector3.one;
                 obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -3000);
                 obj.GetComponent<TaskNew>().targetPosition = new Vector2(0, -700 + (-280 * count));
@@ -149,7 +149,7 @@ public class UISystem : MonoBehaviour
     }
     public void CreateNewTask()
     {
-        StartCoroutine(TaskCreateEnumerator(currentList.id, newTaskName.text.Trim(), newTaskDeadline.text.Trim()));
+        StartCoroutine(TaskCreateEnumerator(currentList.id, newTaskName.text.Trim(), "2021-11-27T11:57:00.000Z"));
     }
     class PostTaskModel
     {
@@ -157,6 +157,7 @@ public class UISystem : MonoBehaviour
         public string status;
         public string deadline;
         public string listId;
+        public string hours;
     }
     class PostListModel
     {
@@ -203,7 +204,8 @@ public class UISystem : MonoBehaviour
             listId = listId,
             name = taskName,
             status = "none",
-            deadline = deadline
+            deadline = deadline,
+            hours = "0"
         };
         var m = JsonUtility.ToJson(model);
         Debug.Log(m);
@@ -211,7 +213,7 @@ public class UISystem : MonoBehaviour
         
         yield return RequestController.PostRequest("task", modelBytes, sessionController.GetAccessToken());
         TaskModel result = JsonUtility.FromJson<TaskModel>(RequestController.GetResponseData());
-        GameObject obj = Instantiate(taskPrefab, taskView.transform);
+        GameObject obj = Instantiate(taskPrefab, taskContainer.transform);
         obj.GetComponent<RectTransform>().localScale = Vector3.one;
         obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -3000);
         obj.GetComponent<TaskNew>().taskName = taskName;
