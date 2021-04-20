@@ -157,7 +157,7 @@ public class UISystem : MonoBehaviour
         completedTaskCount.text = complTaskCount.ToString() + " completed tasks";
         projectProgress.fillAmount = complTaskCount / Mathf.Clamp(taskCount, 1, 9999);
         if (taskCount > 0)
-            percentageField.text = String.Format("{0:0.00}", complTaskCount / taskCount) + "% completed";
+            percentageField.text = String.Format("{0:0.00}", complTaskCount / taskCount*100) + "% completed";
         else percentageField.text = "0% completed";
         yield return new WaitForSeconds(0.1f);
     }

@@ -29,14 +29,14 @@ public class SessionController : MonoBehaviour
         yield return RequestController.GetRequest("list", accessToken);
         var data = RequestController.GetResponseData();
         Debug.Log(data);
-        ReceivedListsData lists = JsonUtility.FromJson<ReceivedListsData>(data);
-        Debug.Log(lists.data.count);
+        ListsModel lists = JsonUtility.FromJson<ListsModel>(data);
+        Debug.Log(lists.count);
 
         List<ListModel> answer = new List<ListModel>();
-        for (int i = 0; i < lists.data.count; i++)
+        for (int i = 0; i < lists.count; i++)
         {
-            answer.Add(lists.data.rows[i]);
-            Debug.Log(lists.data.rows[i]);
+            answer.Add(lists.rows[i]);
+            Debug.Log(lists.rows[i]);
         }
         taskLists = answer;
     }
@@ -47,16 +47,16 @@ public class SessionController : MonoBehaviour
         yield return RequestController.GetRequest("task", accessToken);
         var data = RequestController.GetResponseData();
         Debug.Log(data);
-        ReceivedTasksData t = JsonUtility.FromJson<ReceivedTasksData>(data);
-        Debug.Log(t.data.count);
+        TasksModel t = JsonUtility.FromJson<TasksModel>(data);
+        Debug.Log(t.count);
 
         List<TaskModel> answer = new List<TaskModel>();
-        for (int i = 0; i < t.data.count; i++)
+        for (int i = 0; i < t.count; i++)
         {
-            if (t.data.rows[i].listId.Equals(listId))
+            if (t.rows[i].listId.Equals(listId))
             {
-                answer.Add(t.data.rows[i]);
-                Debug.Log(t.data.rows[i]);
+                answer.Add(t.rows[i]);
+                Debug.Log(t.rows[i]);
             }
         }
         tasks = answer;
@@ -67,14 +67,14 @@ public class SessionController : MonoBehaviour
         yield return RequestController.GetRequest("task", accessToken);
         var data = RequestController.GetResponseData();
         Debug.Log(data);
-        ReceivedTasksData t = JsonUtility.FromJson<ReceivedTasksData>(data);
-        Debug.Log(t.data.count);
+        TasksModel t = JsonUtility.FromJson<TasksModel>(data);
+        Debug.Log(t.count);
 
         List<TaskModel> answer = new List<TaskModel>();
-        for (int i = 0; i < t.data.count; i++)
+        for (int i = 0; i < t.count; i++)
         {
-            answer.Add(t.data.rows[i]);
-            Debug.Log(t.data.rows[i]);
+            answer.Add(t.rows[i]);
+            Debug.Log(t.rows[i]);
         }
         tasks = answer;
     }
@@ -88,6 +88,8 @@ public class ListModel
     public string userId;
     public string updatedAt;
     public string createdAt;
+    public string imageUrl;
+    public string fileManagerId;
 }
 [System.Serializable]
 public class ListsModel

@@ -7,6 +7,10 @@ public class RequestController
 {
     private static string responseData;
 
+    private static string url = "https://dev-api.dealerproductions.com/todo/v1/";
+    //http://ec2-52-59-205-209.eu-central-1.compute.amazonaws.com/api/v0.1/
+    //https://dev-api.dealerproductions.com/todo/v1/
+
     public static string GetResponseData() => responseData;
 
     public static IEnumerator PostRequest(string relativePath, byte[] jsonData, string accessToken)
@@ -14,7 +18,7 @@ public class RequestController
         string data = System.Text.Encoding.UTF8.GetString(jsonData);
         //78.56.76.51:8080/api/v0.1/
         //http://ec2-52-59-205-209.eu-central-1.compute.amazonaws.com/api/v0.1/
-        using (UnityWebRequest www = UnityWebRequest.Put("http://ec2-52-59-205-209.eu-central-1.compute.amazonaws.com/api/v0.1/" + relativePath, jsonData))
+        using (UnityWebRequest www = UnityWebRequest.Put(url + relativePath, jsonData))
         {
             www.method = "POST";
             www.SetRequestHeader("Content-Type", "application/json");
@@ -36,6 +40,7 @@ public class RequestController
             {
                 Debug.Log("Form upload complete!");
                 responseData = www.downloadHandler.text;
+                Debug.Log(www.responseCode);
                 Debug.Log(responseData);
             }
 
@@ -44,7 +49,7 @@ public class RequestController
 
     public static IEnumerator GetRequest(string relativePath, string authorization)
     {
-        using (UnityWebRequest www = UnityWebRequest.Get("http://ec2-52-59-205-209.eu-central-1.compute.amazonaws.com/api/v0.1/" + relativePath))
+        using (UnityWebRequest www = UnityWebRequest.Get(url + relativePath))
         {
             Debug.Log(authorization);
 
@@ -61,6 +66,7 @@ public class RequestController
             {
                 Debug.Log("GET complete!");
                 responseData = www.downloadHandler.text;
+                Debug.Log(www.responseCode);
                 Debug.Log(responseData);
             }
 
@@ -70,7 +76,7 @@ public class RequestController
     public static IEnumerator PutRequest(string relativePath, byte[] jsonData, string accessToken)
     {
         string data = System.Text.Encoding.UTF8.GetString(jsonData);
-        using (UnityWebRequest www = UnityWebRequest.Put("http://ec2-52-59-205-209.eu-central-1.compute.amazonaws.com/api/v0.1/" + relativePath, jsonData))
+        using (UnityWebRequest www = UnityWebRequest.Put(url + relativePath, jsonData))
         {
             www.method = "PUT";
             //www.useHttpContinue = false;
@@ -94,7 +100,7 @@ public class RequestController
     }
     public static IEnumerator DeleteRequest(string relativePath, string accessToken)
     {
-        using (UnityWebRequest www = UnityWebRequest.Delete("http://ec2-52-59-205-209.eu-central-1.compute.amazonaws.com/api/v0.1/" + relativePath))
+        using (UnityWebRequest www = UnityWebRequest.Delete(url + relativePath))
         {
             //www.useHttpContinue = false;
             www.SetRequestHeader("authorization", "Bearer " + accessToken);
