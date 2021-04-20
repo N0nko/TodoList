@@ -28,10 +28,6 @@ public class UISystem : MonoBehaviour
     public Image newTaskForm;
     public TMP_InputField newTaskName, newTaskDeadline;
 
-    private float currentListViewAlpha = 1f;
-    private float currentTaskCircleSize = 1;
-    private float currentTaskViewHolderAlpha = 0;
-    private float currentTaskViewAlpha = 1;
     public float currentFillAmount = 0;
 
     public SessionController sessionController;
@@ -96,6 +92,7 @@ public class UISystem : MonoBehaviour
                 obj.GetComponent<TaskNew>().listId = sessionController.tasks[i].listId;
                 obj.GetComponent<TaskNew>().SetCompleted(sessionController.tasks[i].status == "done" ? true : false);
                 obj.SetActive(false);
+                obj.transform.GetChild(3).gameObject.GetComponent<Button>().onClick.AddListener(obj.GetComponent<TaskNew>().Remove);
                 GetList(sessionController.tasks[i].listId).tasks.Add(obj.GetComponent<TaskNew>());
                 count++;
             }
@@ -152,11 +149,13 @@ public class UISystem : MonoBehaviour
             task.gameObject.SetActive(true);
         }
 
-        taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_Text>().text = list.listName;
+        taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_InputField>().text = list.listName;
+        taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_InputField>().onEndEdit.AddListener(delegate { StartCoroutine(ProjectUpdateEnumerator(currentList.id)); });
         int taskCount = list.tasks.Count;
         int complTaskCount = list.tasks.FindAll(delegate (TaskNew task) { return task.GetCompleted(); }).Count;
         projectTaskCount.text = taskCount.ToString() + " tasks";
         completedTaskCount.text = complTaskCount.ToString() + " completed tasks";
+        projectProgress.fillAmount = complTaskCount / Mathf.Clamp(taskCount, 1, 9999);
         if (taskCount > 0)
             percentageField.text = String.Format("{0:0.00}", complTaskCount / taskCount) + "% completed";
         else percentageField.text = "0% completed";
@@ -178,7 +177,18 @@ public class UISystem : MonoBehaviour
     {
         public string name;
         public string color = "#000000";
+        public string description;
     }
+
+    IEnumerator ProjectUpdateEnumerator(string listID)
+    {
+        PostListModel t = new PostListModel();
+        t.name = taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_InputField>().text;
+        yield return RequestController.PutRequest("list/" + listID, System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(t)), sessionController.GetAccessToken());
+        GetList(listID).listName = t.name;
+        //RefreshProject();
+    }
+
     public void CreateList()
     {
         StartCoroutine(CreateListEnumerator(newListName.text.Trim()));
@@ -229,13 +239,12 @@ public class UISystem : MonoBehaviour
         yield return RequestController.PostRequest("task", modelBytes, sessionController.GetAccessToken());
         TaskModel result = JsonUtility.FromJson<TaskModel>(RequestController.GetResponseData());
         GameObject obj = Instantiate(taskPrefab, taskContainer.transform);
-        obj.GetComponent<RectTransform>().localScale = Vector3.one;
-        obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -3000);
         obj.GetComponent<TaskNew>().taskName = taskName;
         obj.GetComponent<TaskNew>().deadline = deadline;
         obj.GetComponent<TaskNew>().taskId = result.id;
         obj.GetComponent<TaskNew>().listId = result.listId;
         obj.GetComponent<TaskNew>().SetCompleted(false);
+        obj.transform.GetChild(3).gameObject.GetComponent<Button>().onClick.AddListener(obj.GetComponent<TaskNew>().Remove);
         GetList(listId).tasks.Add(obj.GetComponent<TaskNew>());
         currentFillAmount = GetList(listId).GetProgress();
 
@@ -251,27 +260,19 @@ public class UISystem : MonoBehaviour
     IEnumerator TaskRemoveEnumerator(string taskId)
     {
         yield return RequestController.DeleteRequest("task/" + taskId, sessionController.GetAccessToken());
+        RefreshProject();
     }
 
     IEnumerator ReturnToListViewCoroutine()
     {
         
-        currentTaskViewAlpha = 0;
         yield return new WaitForSeconds(0.9f);
         taskViewObject.SetActive(false);
-        currentListViewAlpha = 1;
-        //listView.interactable = true;
-        //RemoveAllTaskObjects();
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*taskViewProgress.fillAmount = Mathf.Lerp(taskViewProgress.fillAmount, currentFillAmount, Time.deltaTime*6);
-        listView.alpha = Mathf.Lerp(listView.alpha, currentListViewAlpha, Time.deltaTime * 6);
-        taskView.alpha = Mathf.Lerp(taskView.alpha, currentTaskViewHolderAlpha, Time.deltaTime * 6);
-        taskViewObject.GetComponent<CanvasGroup>().alpha = Mathf.Lerp(taskViewObject.GetComponent<CanvasGroup>().alpha, currentTaskViewAlpha, Time.deltaTime * 6);
-        taskViewBlue.GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(taskViewBlue.GetComponent<RectTransform>().sizeDelta, new Vector2(currentTaskCircleSize, currentTaskCircleSize), Time.deltaTime * 2);
-        */
+
     }
 }
