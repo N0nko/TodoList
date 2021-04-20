@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 public class UISystem : MonoBehaviour
 {
@@ -12,9 +13,13 @@ public class UISystem : MonoBehaviour
 
     public TaskListNew currentList;
 
-    public CanvasGroup listView, taskView;
+    public UnityEvent openProjectEvent;
+    public UnityEvent backToListViewEvent;
+
+    public GridLayoutGroup listView;
+    public VerticalLayoutGroup taskView;
     public Image taskViewBlue, taskViewProgress;
-    public GameObject listPrefab, taskPrefab, taskViewObject;
+    public GameObject listPrefab, taskPrefab, taskViewObject, taskContainer;
 
     public TMP_InputField newListName;
     public Button newListButton;
@@ -23,13 +28,13 @@ public class UISystem : MonoBehaviour
     public Image newTaskForm;
     public TMP_InputField newTaskName, newTaskDeadline;
 
-    private float currentListViewAlpha = 1f;
-    private float currentTaskCircleSize = 1;
-    private float currentTaskViewHolderAlpha = 0;
-    private float currentTaskViewAlpha = 1;
     public float currentFillAmount = 0;
 
     public SessionController sessionController;
+
+    public TMP_Text projectTaskCount, completedTaskCount, noteCount, percentageField;
+    public Image projectProgress;
+
 
     private void Awake()
     {
@@ -57,6 +62,7 @@ public class UISystem : MonoBehaviour
     {
         for(int i = 0; i < sessionController.taskLists.Count; i++)
         {
+            Debug.Log(sessionController.taskLists[i].name);
             GameObject obj = Instantiate(listPrefab, listView.transform);
             obj.GetComponent<RectTransform>().localScale = Vector3.one;
             obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -3000);
@@ -76,7 +82,7 @@ public class UISystem : MonoBehaviour
         {
             if (sessionController.tasks[i].listId == list.id)
             {
-                GameObject obj = Instantiate(taskPrefab, taskView.transform);
+                GameObject obj = Instantiate(taskPrefab, taskContainer.transform);
                 obj.GetComponent<RectTransform>().localScale = Vector3.one;
                 obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -3000);
                 obj.GetComponent<TaskNew>().targetPosition = new Vector2(0, -700 + (-280 * count));
@@ -86,20 +92,27 @@ public class UISystem : MonoBehaviour
                 obj.GetComponent<TaskNew>().listId = sessionController.tasks[i].listId;
                 obj.GetComponent<TaskNew>().SetCompleted(sessionController.tasks[i].status == "done" ? true : false);
                 obj.SetActive(false);
+                obj.transform.GetChild(3).gameObject.GetComponent<Button>().onClick.AddListener(obj.GetComponent<TaskNew>().Remove);
                 GetList(sessionController.tasks[i].listId).tasks.Add(obj.GetComponent<TaskNew>());
                 count++;
             }
         }
     }
+    public void RefreshProject()
+    {
+        StartCoroutine(TaskViewCoroutine(currentList));
+    }
 
     public void EnterTaskView(TaskListNew list)
     {
         StartCoroutine(TaskViewCoroutine(list));
+        openProjectEvent.Invoke();
         currentList = list;
     }
     public void GoBackToListView()
     {
-        StartCoroutine(ReturnToListViewCoroutine());
+        //StartCoroutine(ReturnToListViewCoroutine());
+        backToListViewEvent.Invoke();
     }
     public void RemoveAllTaskObjects()
     {
@@ -136,27 +149,21 @@ public class UISystem : MonoBehaviour
             task.gameObject.SetActive(true);
         }
 
-        taskViewObject.transform.GetChild(0).GetChild(2).gameObject.GetComponent<TMPro.TMP_Text>().text = list.listName;
-        taskViewBlue.GetComponent<RectTransform>().sizeDelta = new Vector2(1, 1);
-        taskViewProgress.fillAmount = 0;
-        currentFillAmount = 0;
-        currentListViewAlpha = 0;
-        currentTaskViewAlpha = 1;
-        currentTaskViewHolderAlpha = 0;
-        currentTaskCircleSize = 1;
-        listView.interactable = false;
-        yield return new WaitForSeconds(0.5f);
-        
-        taskViewObject.gameObject.SetActive(true);
-        currentTaskCircleSize = 3000;
-        yield return new WaitForSeconds(0.8f);
-        currentTaskViewHolderAlpha = 1;
-        yield return new WaitForSeconds(0.3f);
-        currentFillAmount = list.GetProgress();
+        taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_InputField>().text = list.listName;
+        taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_InputField>().onEndEdit.AddListener(delegate { StartCoroutine(ProjectUpdateEnumerator(currentList.id)); });
+        int taskCount = list.tasks.Count;
+        int complTaskCount = list.tasks.FindAll(delegate (TaskNew task) { return task.GetCompleted(); }).Count;
+        projectTaskCount.text = taskCount.ToString() + " tasks";
+        completedTaskCount.text = complTaskCount.ToString() + " completed tasks";
+        projectProgress.fillAmount = complTaskCount / Mathf.Clamp(taskCount, 1, 9999);
+        if (taskCount > 0)
+            percentageField.text = String.Format("{0:0.00}", complTaskCount / taskCount) + "% completed";
+        else percentageField.text = "0% completed";
+        yield return new WaitForSeconds(0.1f);
     }
     public void CreateNewTask()
     {
-        StartCoroutine(TaskCreateEnumerator(currentList.id, newTaskName.text.Trim(), newTaskDeadline.text.Trim()));
+        StartCoroutine(TaskCreateEnumerator(currentList.id, newTaskName.text.Trim(), "2021-11-27T11:57:00.000Z"));
     }
     class PostTaskModel
     {
@@ -164,12 +171,24 @@ public class UISystem : MonoBehaviour
         public string status;
         public string deadline;
         public string listId;
+        public string hours;
     }
     class PostListModel
     {
         public string name;
         public string color = "#000000";
+        public string description;
     }
+
+    IEnumerator ProjectUpdateEnumerator(string listID)
+    {
+        PostListModel t = new PostListModel();
+        t.name = taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_InputField>().text;
+        yield return RequestController.PutRequest("list/" + listID, System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(t)), sessionController.GetAccessToken());
+        GetList(listID).listName = t.name;
+        //RefreshProject();
+    }
+
     public void CreateList()
     {
         StartCoroutine(CreateListEnumerator(newListName.text.Trim()));
@@ -180,7 +199,7 @@ public class UISystem : MonoBehaviour
         t.name = name;
         var to = JsonUtility.ToJson(t);
         var bytes = System.Text.Encoding.UTF8.GetBytes(to);
-        yield return RequestController.PostRequestWorkaround("list", bytes, sessionController.GetAccessToken());
+        yield return RequestController.PostRequest("list", bytes, sessionController.GetAccessToken());
 
         ListModel result = JsonUtility.FromJson<ListModel>(RequestController.GetResponseData());
         GameObject obj = Instantiate(listPrefab, listView.transform);
@@ -210,26 +229,27 @@ public class UISystem : MonoBehaviour
             listId = listId,
             name = taskName,
             status = "none",
-            deadline = deadline
+            deadline = deadline,
+            hours = "0"
         };
         var m = JsonUtility.ToJson(model);
         Debug.Log(m);
         var modelBytes = System.Text.Encoding.UTF8.GetBytes(m);
         
-        yield return RequestController.PostRequestWorkaround("task", modelBytes, sessionController.GetAccessToken());
+        yield return RequestController.PostRequest("task", modelBytes, sessionController.GetAccessToken());
         TaskModel result = JsonUtility.FromJson<TaskModel>(RequestController.GetResponseData());
-        GameObject obj = Instantiate(taskPrefab, taskView.transform);
-        obj.GetComponent<RectTransform>().localScale = Vector3.one;
-        obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -3000);
+        GameObject obj = Instantiate(taskPrefab, taskContainer.transform);
         obj.GetComponent<TaskNew>().taskName = taskName;
         obj.GetComponent<TaskNew>().deadline = deadline;
         obj.GetComponent<TaskNew>().taskId = result.id;
         obj.GetComponent<TaskNew>().listId = result.listId;
         obj.GetComponent<TaskNew>().SetCompleted(false);
+        obj.transform.GetChild(3).gameObject.GetComponent<Button>().onClick.AddListener(obj.GetComponent<TaskNew>().Remove);
         GetList(listId).tasks.Add(obj.GetComponent<TaskNew>());
         currentFillAmount = GetList(listId).GetProgress();
 
         newTaskForm.gameObject.SetActive(false);
+        RefreshProject();
     }
 
     public void RemoveTask(string taskId)
@@ -240,39 +260,19 @@ public class UISystem : MonoBehaviour
     IEnumerator TaskRemoveEnumerator(string taskId)
     {
         yield return RequestController.DeleteRequest("task/" + taskId, sessionController.GetAccessToken());
+        RefreshProject();
     }
 
     IEnumerator ReturnToListViewCoroutine()
     {
         
-        currentTaskViewAlpha = 0;
         yield return new WaitForSeconds(0.9f);
         taskViewObject.SetActive(false);
-        currentListViewAlpha = 1;
-        listView.interactable = true;
-        //RemoveAllTaskObjects();
     }
 
     // Update is called once per frame
     void Update()
     {
-        taskViewProgress.fillAmount = Mathf.Lerp(taskViewProgress.fillAmount, currentFillAmount, Time.deltaTime*6);
-        listView.alpha = Mathf.Lerp(listView.alpha, currentListViewAlpha, Time.deltaTime * 6);
-        taskView.alpha = Mathf.Lerp(taskView.alpha, currentTaskViewHolderAlpha, Time.deltaTime * 6);
-        taskViewObject.GetComponent<CanvasGroup>().alpha = Mathf.Lerp(taskViewObject.GetComponent<CanvasGroup>().alpha, currentTaskViewAlpha, Time.deltaTime * 6);
-        taskViewBlue.GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(taskViewBlue.GetComponent<RectTransform>().sizeDelta, new Vector2(currentTaskCircleSize, currentTaskCircleSize), Time.deltaTime * 2);
-        foreach (TaskListNew taskList in taskLists)
-        {
-            
-            for (int i = 0; i < taskList.tasks.Count; i++)
-            {
-                taskList.tasks[i].targetPosition = new Vector2(0, -700 + (-280 * i));
-            }
-        }
 
-        for(int i = 0; i < taskLists.Count; i++)
-        {
-            taskLists[i].targetPosition = new Vector2(0, -700 + (-200 * i));
-        }
     }
 }

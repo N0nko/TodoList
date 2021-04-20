@@ -53,16 +53,16 @@ public class TaskNew : MonoBehaviour
     }
     void Start()
     {
-        transform.GetChild(2).gameObject.GetComponent<Button>().onClick.AddListener( delegate { ToggleComplete(); });
-        transform.GetChild(1).gameObject.GetComponent<Button>().onClick.AddListener(delegate { Remove(); });
+        //transform.GetChild(2).gameObject.GetComponent<Button>().onClick.AddListener( delegate { ToggleComplete(); });
+        //transform.GetChild(1).gameObject.GetComponent<Button>().onClick.AddListener(delegate { Remove(); });
     }
 
     // Update is called once per frame
     void Update()
     {
         transform.GetChild(0).gameObject.GetComponent<TMPro.TMP_Text>().text = taskName;
-        transform.GetChild(3).gameObject.GetComponent<TMPro.TMP_Text>().text = "Until " + deadline;
-        transform.GetChild(2).gameObject.GetComponent<Image>().color = GetCompleted() ? Color.green : Color.white;
-        GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(GetComponent<RectTransform>().anchoredPosition, targetPosition, Time.deltaTime * 6);
+        //transform.GetChild(3).gameObject.GetComponent<TMPro.TMP_Text>().text = "Until " + deadline;
+        //transform.GetChild(2).gameObject.GetComponent<Image>().color = GetCompleted() ? Color.green : Color.white;
+        //GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(GetComponent<RectTransform>().anchoredPosition, targetPosition, Time.deltaTime * 6);
     }
 }
