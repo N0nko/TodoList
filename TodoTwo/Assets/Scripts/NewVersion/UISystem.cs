@@ -36,6 +36,10 @@ public class UISystem : MonoBehaviour
 
     public SessionController sessionController;
 
+    public TMP_Text projectTaskCount, completedTaskCount, noteCount, percentageField;
+    public Image projectProgress;
+
+
     private void Awake()
     {
         instance = this;
@@ -97,6 +101,10 @@ public class UISystem : MonoBehaviour
             }
         }
     }
+    public void RefreshProject()
+    {
+        StartCoroutine(TaskViewCoroutine(currentList));
+    }
 
     public void EnterTaskView(TaskListNew list)
     {
@@ -145,6 +153,13 @@ public class UISystem : MonoBehaviour
         }
 
         taskViewObject.transform.GetChild(1).GetChild(0).gameObject.GetComponent<TMPro.TMP_Text>().text = list.listName;
+        int taskCount = list.tasks.Count;
+        int complTaskCount = list.tasks.FindAll(delegate (TaskNew task) { return task.GetCompleted(); }).Count;
+        projectTaskCount.text = taskCount.ToString() + " tasks";
+        completedTaskCount.text = complTaskCount.ToString() + " completed tasks";
+        if (taskCount > 0)
+            percentageField.text = String.Format("{0:0.00}", complTaskCount / taskCount) + "% completed";
+        else percentageField.text = "0% completed";
         yield return new WaitForSeconds(0.1f);
     }
     public void CreateNewTask()
@@ -225,6 +240,7 @@ public class UISystem : MonoBehaviour
         currentFillAmount = GetList(listId).GetProgress();
 
         newTaskForm.gameObject.SetActive(false);
+        RefreshProject();
     }
 
     public void RemoveTask(string taskId)
