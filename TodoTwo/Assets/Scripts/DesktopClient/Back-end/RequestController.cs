@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class RequestController : MonoBehaviour
+public class RequestController
 {
     private static string responseData;
 
@@ -29,6 +29,7 @@ public class RequestController : MonoBehaviour
             if (www.isNetworkError || www.isHttpError)
             {
                 Debug.Log(www.error);
+                responseData = www.error;
                 Debug.Log(www.downloadHandler.text);
             }
             else

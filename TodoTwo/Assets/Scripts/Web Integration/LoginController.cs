@@ -15,7 +15,7 @@ public class LoginController : MonoBehaviour
 
     public UnityEvent loginButtonClickEvent;
     public UnityEvent loginEvent;
-    class Code
+    public class Code
     {
         public string code;
     }
