@@ -30,7 +30,10 @@ namespace Tests
 
             string loginData2 = "{\"username\":\"\",\"password\":\"\"}";
             yield return RequestController.PostRequest("authentication/login", System.Text.Encoding.UTF8.GetBytes(loginData2), "");
-            //LoginController.Code responseCode2 = JsonUtility.FromJson<LoginController.Code>(RequestController.GetResponseData());
+            Assert.IsTrue(RequestController.GetResponseData().Contains("400 Bad Request"));
+
+            string loginData3 = "{\"username\":\"xxxxxxxxxxxx\",\"password\":xxxxxxxxxxxxxx\"\"}";
+            yield return RequestController.PostRequest("authentication/login", System.Text.Encoding.UTF8.GetBytes(loginData3), "");
             Assert.IsTrue(RequestController.GetResponseData().Contains("400 Bad Request"));
         }
     }
