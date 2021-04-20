@@ -24,6 +24,7 @@ public class SessionController : MonoBehaviour
     }
     public List<ListModel> taskLists = new List<ListModel>();
     public List<TaskModel> tasks = new List<TaskModel>();
+
     public IEnumerator GetLists()
     {
         yield return RequestController.GetRequest("list", accessToken);
@@ -77,6 +78,23 @@ public class SessionController : MonoBehaviour
             Debug.Log(t.rows[i]);
         }
         tasks = answer;
+    }
+    public IEnumerator GetAllProgress()
+    {
+        //tasks = new List<TaskModel>();
+        yield return RequestController.GetRequest("progress", accessToken);
+        var data = RequestController.GetResponseData();
+        //Debug.Log(data);
+        //TasksModel t = JsonUtility.FromJson<TasksModel>(data);
+        //Debug.Log(t.count);
+
+        //List<TaskModel> answer = new List<TaskModel>();
+        //for (int i = 0; i < t.count; i++)
+        //{
+        //    answer.Add(t.rows[i]);
+        //    Debug.Log(t.rows[i]);
+        //}
+        //tasks = answer;
     }
 }
 [System.Serializable]

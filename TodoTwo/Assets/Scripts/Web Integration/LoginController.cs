@@ -113,6 +113,8 @@ public class LoginController : MonoBehaviour
         UISystem.instance.GenerateTaskLists();
         yield return sessionController.GetAllTasks();
         UISystem.instance.MapTasksToLists();
+      //  yield return sessionController.GetAllProgress();
+        Histograms.instance.GenerateHistograms();
 
         loginEvent.Invoke();
     }
