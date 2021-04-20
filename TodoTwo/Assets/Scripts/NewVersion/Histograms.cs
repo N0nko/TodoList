@@ -32,7 +32,7 @@ public class Histograms : MonoBehaviour
                     continue;
                 GameObject slider = Instantiate(histogramSlider, container.transform);
                 slider.GetComponentInChildren<TextMeshProUGUI>().text = task.name;
-              //  slider.GetComponentInChildren<Slider>().maxValue = task.hours;
+                slider.GetComponentInChildren<Slider>().value = Random.Range(slider.GetComponentInChildren<Slider>().minValue, slider.GetComponentInChildren<Slider>().maxValue);
                 sliderCount++;
                 totalSliderCount++;
             }
