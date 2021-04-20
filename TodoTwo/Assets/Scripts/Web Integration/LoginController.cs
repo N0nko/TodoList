@@ -20,7 +20,7 @@ public class LoginController : MonoBehaviour
         public string code;
     }
 
-    class Token
+    public class Token
     {
         public string id;
         public string accessToken;
@@ -36,7 +36,7 @@ public class LoginController : MonoBehaviour
     string code;
     string accessToken;
 
-    class LoginForm
+    public class LoginForm
     {
         public string username;
         public string password;
@@ -48,7 +48,7 @@ public class LoginController : MonoBehaviour
         }
     }
 
-    class TokenForm
+    public class TokenForm
     {
         public string grantType;
         public string code;
@@ -68,9 +68,15 @@ public class LoginController : MonoBehaviour
         StartCoroutine(LoginEnumerator(u, psw));
     }
 
+    public void LoginCall(string u, string psw)
+    {
+        loginButtonClickEvent.Invoke();
+        StartCoroutine(LoginEnumerator(u, psw));
+    }
+
     public string GetAccessToken() => accessToken;
     // Start is called before the first frame update
-    IEnumerator LoginEnumerator(string username, string password)
+    public IEnumerator LoginEnumerator(string username, string password)
     {
         var login = new LoginForm(username, password);
         var f = JsonUtility.ToJson(login);

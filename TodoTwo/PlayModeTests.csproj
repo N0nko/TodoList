@@ -63,6 +63,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\PlayMode Tests\BackTests.cs" />
+    <Compile Include="Assets\PlayMode Tests\PlayMode Histogram.cs" />
+    <Compile Include="Assets\PlayMode Tests\PlayModeDataToObject.cs" />
     <None Include="Assets\PlayMode Tests\PlayMode Tests.asmdef" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.4.18f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
